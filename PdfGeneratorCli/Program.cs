@@ -7,8 +7,8 @@ QuestPDF.Settings.License = LicenseType.Community;
 Console.WriteLine("HTML to PDF Generator");
 Console.WriteLine("=====================\n");
 
-string jsonFilePath = "/home/runner/work/HtmlToPdf/HtmlToPdf/01ebdf62-b7e5-19e8-8000-00142dc07b4a--c10_2025-09-02_13-01_.json";
-string outputPath = "/home/runner/work/HtmlToPdf/HtmlToPdf/generated_report.pdf";
+string jsonFilePath = "../01ebdf62-b7e5-19e8-8000-00142dc07b4a--c10_2025-09-02_13-01_.json";
+string outputPath = "../generated_report.pdf";
 
 // Allow command line arguments to override defaults
 if (args.Length >= 1)
