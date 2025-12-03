@@ -11,6 +11,8 @@ builder.Services.AddRazorPages();
 builder.Services.AddScoped<JsonReaderService>();
 builder.Services.AddScoped<PdfGeneratorService>();
 builder.Services.AddScoped<NodeJsPdfGeneratorService>();
+builder.Services.AddScoped<HtmlReportGeneratorService>();
+builder.Services.AddScoped<HtmlToPdfService>();
 
 var app = builder.Build();
 

@@ -29,7 +29,13 @@
                                value="@Model.OutputPath" required>
                         <small class="form-text text-muted">Enter the path for the generated PDF file</small>
                     </div>
-                    <button type="submit" class="btn btn-primary">Generate PDF</button>
+                    <button type="submit" class="btn btn-primary">Generate PDF (Node.js)</button>
+                </form>
+
+                <form method="post" asp-page-handler="GenerateHtmlPdf" class="mb-3">
+                    <input type="hidden" name="jsonFilePath" value="@Model.JsonFilePath" />
+                    <input type="hidden" name="outputPath" value="@Model.OutputPath" />
+                    <button type="submit" class="btn btn-success">Generate PDF from HTML (.NET)</button>
                 </form>
 
                 @if (!string.IsNullOrEmpty(Model.Message))
