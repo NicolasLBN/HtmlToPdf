@@ -10,6 +10,7 @@ public class IndexModel : PageModel
     private readonly JsonReaderService _jsonReaderService;
     private readonly HtmlReportGeneratorService _htmlReportGeneratorService;
     private readonly HtmlToPdfService _htmlToPdfService;
+    private readonly EnhancedPdfGeneratorService _enhancedPdfGeneratorService;
 
     public string JsonFilePath { get; set; } = "../01ebdf62-b7e5-19e8-8000-00142dc07b4a--c10_2025-09-02_13-01_.json";
     public string OutputPath { get; set; } = "../output.pdf";
@@ -20,12 +21,14 @@ public class IndexModel : PageModel
         NodeJsPdfGeneratorService nodeJsPdfGeneratorService,
         JsonReaderService jsonReaderService,
         HtmlReportGeneratorService htmlReportGeneratorService,
-        HtmlToPdfService htmlToPdfService)
+        HtmlToPdfService htmlToPdfService,
+        EnhancedPdfGeneratorService enhancedPdfGeneratorService)
     {
         _nodeJsPdfGeneratorService = nodeJsPdfGeneratorService;
         _jsonReaderService = jsonReaderService;
         _htmlReportGeneratorService = htmlReportGeneratorService;
         _htmlToPdfService = htmlToPdfService;
+        _enhancedPdfGeneratorService = enhancedPdfGeneratorService;
     }
 
     public void OnGet()
@@ -92,10 +95,11 @@ public class IndexModel : PageModel
             var htmlPath = Path.ChangeExtension(absoluteOutputPath, ".html");
             _htmlToPdfService.SaveHtmlToFile(htmlContent, htmlPath);
             
-            // Convert HTML to PDF
-            await _htmlToPdfService.ConvertHtmlToPdfAsync(htmlContent, absoluteOutputPath);
+            // Generate PDF using QuestPDF (enhanced version that matches HTML style)
+            var pdfPath = Path.ChangeExtension(absoluteOutputPath, "_enhanced.pdf");
+            _enhancedPdfGeneratorService.GeneratePdf(reportData, pdfPath);
 
-            Message = $"PDF generated successfully from HTML at: {absoluteOutputPath}\nHTML report saved at: {htmlPath}";
+            Message = $"PDF generated successfully from .NET at: {pdfPath}\nHTML report saved at: {htmlPath}";
             IsSuccess = true;
             JsonFilePath = jsonFilePath;
             OutputPath = outputPath;
