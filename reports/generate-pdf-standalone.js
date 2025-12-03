@@ -256,10 +256,10 @@ async function generatePdf(jsonPath, pdfPath) {
       });
       
       // Add note if data was truncated
-      if (rows.length > maxRows) {
+      if (jsonData.data.rows.length > maxRows) {
         doc.setFontSize(8);
         doc.setFont('helvetica', 'italic');
-        doc.text(`Showing first ${maxRows} of ${rows.length} data points`, 15, doc.lastAutoTable.finalY + 10);
+        doc.text(`Showing first ${maxRows} of ${jsonData.data.rows.length} data points`, 15, doc.lastAutoTable.finalY + 10);
       }
     }
 
@@ -276,8 +276,13 @@ async function generatePdf(jsonPath, pdfPath) {
 }
 
 /**
- * Calculate column widths as their ratios
- * @param ratios e.g. [2,1,3,3] means column 0 is twice as big as column 1
+ * There is no config to specify column widths as their ratios,
+ * so we need to calculate them manually
+ *
+ * @param ratios e.g. [2,1,3,3] means:
+ * - ratios[0] is twice as big as ratios[1]
+ * - ratios[2] and ratios[3] are the same size
+ * - ratios[2] is the same size as ratios[0] + ratios[1]
  */
 function applyColumnStyles(ratios, tableWidth) {
   const styles = {};
