@@ -1,0 +1,44 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "PDF Generator";
+}
+
+<div class="text-center">
+    <h1 class="display-4">HTML to PDF Generator</h1>
+    <p class="lead">Generate PDF reports from JSON data</p>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header">
+                <h3>Generate PDF Report</h3>
+            </div>
+            <div class="card-body">
+                <form method="post" class="mb-3">
+                    <div class="mb-3">
+                        <label for="jsonFilePath" class="form-label">JSON File Path</label>
+                        <input type="text" class="form-control" id="jsonFilePath" name="jsonFilePath" 
+                               value="@Model.JsonFilePath" required>
+                        <small class="form-text text-muted">Enter the path to the JSON file</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="outputPath" class="form-label">Output PDF Path</label>
+                        <input type="text" class="form-control" id="outputPath" name="outputPath" 
+                               value="@Model.OutputPath" required>
+                        <small class="form-text text-muted">Enter the path for the generated PDF file</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Generate PDF</button>
+                </form>
+
+                @if (!string.IsNullOrEmpty(Model.Message))
+                {
+                    <div class="alert @(Model.IsSuccess ? "alert-success" : "alert-danger")" role="alert">
+                        @Model.Message
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
