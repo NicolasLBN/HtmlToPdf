@@ -1,4 +1,8 @@
 using PdfGeneratorCli.Services;
+using QuestPDF.Infrastructure;
+
+// Configure QuestPDF license once at startup
+QuestPDF.Settings.License = LicenseType.Community;
 
 Console.WriteLine("HTML to PDF Generator");
 Console.WriteLine("=====================\n");

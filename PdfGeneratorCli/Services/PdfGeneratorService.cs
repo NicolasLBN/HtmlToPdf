@@ -7,10 +7,10 @@ namespace PdfGeneratorCli.Services;
 
 public class PdfGeneratorService
 {
+    private const int MaxDataRowsToDisplay = 20;
+
     public void GeneratePdf(ReportData reportData, string outputPath)
     {
-        QuestPDF.Settings.License = LicenseType.Community;
-
         var document = Document.Create(container =>
         {
             // Page 1 - Metadata
@@ -174,8 +174,8 @@ public class PdfGeneratorService
                             }
                         });
 
-                        // Data rows - limit to first 20 for display
-                        var rowsToShow = reportData.Data.Rows.Take(20);
+                        // Data rows - limit to MaxDataRowsToDisplay for display
+                        var rowsToShow = reportData.Data.Rows.Take(MaxDataRowsToDisplay);
                         foreach (var row in rowsToShow)
                         {
                             foreach (var cell in row)

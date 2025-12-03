@@ -38,3 +38,6 @@ Thumbs.db
 *.swp
 *.swo
 *~
+
+# Frontend libraries (restored via libman)
+**/wwwroot/lib/
