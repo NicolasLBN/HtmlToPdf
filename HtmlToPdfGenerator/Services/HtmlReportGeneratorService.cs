@@ -222,17 +222,19 @@ public class HtmlReportGeneratorService
                 {
                     try
                     {
-                        var distance = Convert.ToDouble(row[1]);
-                        var speed = Convert.ToDouble(row[2]);
-                        var force = Convert.ToDouble(row[3]);
+                        // Use invariant culture to ensure consistent number parsing across locales
+                        var distance = Convert.ToDouble(row[1], CultureInfo.InvariantCulture);
+                        var speed = Convert.ToDouble(row[2], CultureInfo.InvariantCulture);
+                        var force = Convert.ToDouble(row[3], CultureInfo.InvariantCulture);
                         
                         distances.Add(distance);
                         forces.Add(force);
                         speeds.Add(speed);
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        // Skip invalid rows
+                        // Skip invalid rows but log for debugging
+                        System.Diagnostics.Debug.WriteLine($"Skipping invalid row data: {ex.Message}");
                     }
                 }
             }

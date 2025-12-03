@@ -23,15 +23,30 @@ public class HtmlToPdfService
         {
             _logger.LogInformation("Converting HTML to PDF: {OutputPath}", outputPath);
 
-            // Ensure browser is downloaded (only happens once)
-            await EnsureBrowserDownloadedAsync();
-
-            // Launch browser
-            var launchOptions = new LaunchOptions
+            // Try to use system Chrome first, fallback to downloading if not available
+            var chromePath = FindSystemChrome();
+            LaunchOptions launchOptions;
+            
+            if (!string.IsNullOrEmpty(chromePath))
             {
-                Headless = true,
-                Args = new[] { "--no-sandbox", "--disable-setuid-sandbox" }
-            };
+                _logger.LogInformation("Using system Chrome at: {ChromePath}", chromePath);
+                launchOptions = new LaunchOptions
+                {
+                    Headless = true,
+                    ExecutablePath = chromePath,
+                    Args = new[] { "--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage" }
+                };
+            }
+            else
+            {
+                // Ensure browser is downloaded (only happens once)
+                await EnsureBrowserDownloadedAsync();
+                launchOptions = new LaunchOptions
+                {
+                    Headless = true,
+                    Args = new[] { "--no-sandbox", "--disable-setuid-sandbox" }
+                };
+            }
 
             await using var browser = await Puppeteer.LaunchAsync(launchOptions);
             await using var page = await browser.NewPageAsync();
@@ -86,6 +101,30 @@ public class HtmlToPdfService
         {
             _browserFetchLock.Release();
         }
+    }
+    
+    private string FindSystemChrome()
+    {
+        var possiblePaths = new[]
+        {
+            "/usr/bin/google-chrome",
+            "/usr/bin/chromium-browser",
+            "/usr/bin/chromium",
+            "/snap/bin/chromium",
+            "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+            "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+            "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+        };
+
+        foreach (var path in possiblePaths)
+        {
+            if (File.Exists(path))
+            {
+                return path;
+            }
+        }
+
+        return string.Empty;
     }
     
     public void SaveHtmlToFile(string htmlContent, string outputPath)

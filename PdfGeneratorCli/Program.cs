@@ -78,15 +78,21 @@ class HtmlToPdfServiceWrapper
 {
     public async Task ConvertHtmlToPdfAsync(string htmlContent, string outputPath)
     {
-        // Ensure browser is downloaded (only happens once)
-        var browserFetcher = new BrowserFetcher();
-        await browserFetcher.DownloadAsync();
+        // Use system-installed Chrome/Chromium instead of downloading
+        var chromePath = FindChromePath();
+        if (string.IsNullOrEmpty(chromePath))
+        {
+            throw new Exception("Chrome/Chromium not found. Please install Chrome or Chromium.");
+        }
+        
+        Console.WriteLine($"Using Chrome at: {chromePath}");
 
         // Launch browser
         var launchOptions = new LaunchOptions
         {
             Headless = true,
-            Args = new[] { "--no-sandbox", "--disable-setuid-sandbox" }
+            ExecutablePath = chromePath,
+            Args = new[] { "--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage" }
         };
 
         await using var browser = await Puppeteer.LaunchAsync(launchOptions);
@@ -111,6 +117,30 @@ class HtmlToPdfServiceWrapper
         };
 
         await page.PdfAsync(outputPath, pdfOptions);
+    }
+    
+    private static string FindChromePath()
+    {
+        var possiblePaths = new[]
+        {
+            "/usr/bin/google-chrome",
+            "/usr/bin/chromium-browser",
+            "/usr/bin/chromium",
+            "/snap/bin/chromium",
+            "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+            "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+            "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+        };
+
+        foreach (var path in possiblePaths)
+        {
+            if (File.Exists(path))
+            {
+                return path;
+            }
+        }
+
+        return string.Empty;
     }
 }
 
