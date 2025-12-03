@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Installation Report</title>
+    <script src='https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js'></script>
+    <style>
+
+            body {
+                font-family: 'Helvetica', Arial, sans-serif;
+                font-size: 8pt;
+                margin: 15mm;
+                color: #000000;
+            }
+            
+            .metadata-table {
+                width: 100%;
+                border-collapse: collapse;
+                border: 0.5pt solid #000000;
+                margin-bottom: 20px;
+            }
+            
+            .metadata-table td {
+                border: 0.1pt solid #5c5c5c;
+                padding: 1mm 0.5mm;
+                font-size: 8pt;
+            }
+            
+            .metadata-table .title {
+                text-align: center;
+                font-size: 18pt;
+                font-weight: bold;
+                padding: 5mm;
+            }
+            
+            .metadata-table .label {
+                font-weight: bold;
+            }
+            
+            .metadata-table .separator {
+                border: none;
+            }
+            
+            .metadata-table .separator td {
+                border: none;
+                border-bottom: 1pt solid #000000;
+            }
+            
+            .metadata-table .section-header {
+                background-color: #cccccc;
+                font-weight: bold;
+                text-align: center;
+                font-size: 10pt;
+            }
+            
+            .metadata-table tr:nth-child(6) {
+                border-bottom: 1pt solid #000000;
+            }
+            
+            .metadata-table tr:nth-child(14) {
+                border-bottom: 1pt solid #000000;
+            }
+            
+            .metadata-table .summary-row {
+                border-top: 1pt solid #000000;
+            }
+            
+            .chart-container {
+                width: 100%;
+                height: 400px;
+                margin: 10mm 0;
+                page-break-inside: avoid;
+            }
+            
+            .page-break {
+                page-break-after: always;
+            }
+            
+            h2 {
+                font-size: 10pt;
+                font-weight: normal;
+                margin-top: 5mm;
+                margin-bottom: 3mm;
+            }
+            
+            .data-table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 8pt;
+            }
+            
+            .data-table thead {
+                background-color: #f0f0f0;
+            }
+            
+            .data-table th {
+                border: 0.5pt solid #000000;
+                padding: 2mm 1mm;
+                text-align: center;
+                font-weight: bold;
+                font-size: 7pt;
+                line-height: 1.2;
+            }
+            
+            .data-table td {
+                border: 0.5pt solid #cccccc;
+                padding: 1mm;
+                text-align: center;
+                font-size: 7pt;
+            }
+            
+            .data-table tbody tr:nth-child(even) {
+                background-color: #f9f9f9;
+            }
+            
+            @media print {
+                body {
+                    margin: 15mm;
+                }
+                .page-break {
+                    page-break-after: always;
+                }
+            }
+        
+    </style>
+</head>
+<body>
+    <table class='metadata-table'>
+        <tr>
+            <td colspan='4' class='title'>INSTALLATION REPORT</td>
+        </tr>
+        <tr>
+            <td class='label'>Project</td>
+            <td colspan='2'>c10</td>
+            <td>Date: 02/09/2025 13:01</td>
+        </tr>
+        <tr>
+            <td class='label'>Section</td>
+            <td colspan='3'></td>
+        </tr>
+        <tr>
+            <td class='label'>Company</td>
+            <td colspan='2'>psa</td>
+            <td>Operator: dd</td>
+        </tr>
+        <tr>
+            <td class='label'>GPS</td>
+            <td colspan='3'>46.245185, 7.001220, 421.9m</td>
+        </tr>
+        <tr class='separator'>
+            <td colspan='4'>&nbsp;</td>
+        </tr>
+        <tr>
+            <td colspan='2' class='section-header'>DUCT</td>
+            <td class='section-header'>CABLE</td>
+            <td class='section-header'>MACHINE</td>
+        </tr>
+        <tr>
+            <td colspan='2'>Supplier: </td>
+            <td>Supplier: </td>
+            <td>Optijet (SN#112)</td>
+        </tr>
+        <tr>
+            <td colspan='2'>Type: </td>
+            <td>Type: AD2Y</td>
+            <td>Asset: ATEL PSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</td>
+        </tr>
+        <tr>
+            <td colspan='2'>Configuration: </td>
+            <td>Diameter: 6 mm, Fibers: 2</td>
+            <td>Lubricator: [ ]</td>
+        </tr>
+        <tr>
+            <td colspan='2'>Color: Rot</td>
+            <td>Reel: f</td>
+            <td>Lubricant: withoutaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa   aaaaaaaaaaaaaaa   aaaaaaaaaaaaaaaaaaaaaaaaaaaa</td>
+        </tr>
+        <tr>
+            <td colspan='2'>Inner Layer: corrugated</td>
+            <td>Installed In: SpeedNetRohr</td>
+            <td>Compressor: </td>
+        </tr>
+        <tr>
+            <td colspan='2'>Temperature: 0°C</td>
+            <td>Cable Temp: 0°C</td>
+            <td>Aftercooler: [ ]</td>
+        </tr>
+        <tr>
+            <td colspan='2'>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>Cable Head: [ ]</td>
+        </tr>
+        <tr class='summary-row'>
+            <td class='section-header'>SUMMARY</td>
+            <td colspan='3'>Max Push Force: 200 N</td>
+        </tr>
+    </table>
+    <div class='chart-container'>
+        <canvas id='forceChart'></canvas>
+    </div>
+    <script>
+        window.addEventListener('load', function() {
+            const ctx = document.getElementById('forceChart').getContext('2d');
+            
+            const distances = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0, 28.0, 29.0, 30.0, 31.0, 32.0, 33.0, 34.0, 35.0, 36.0, 37.0, 38.0, 39.0, 40.0, 41.0, 42.0, 43.0, 44.0, 45.0, 46.0, 47.0, 48.0, 49.0, 50.0, 51.0, 52.0, 53.0, 54.0, 55.0, 55.9, 56.0, 57.0, 58.0, 59.0, 60.0, 61.0, 61.5];
+            const forces = [0.0, 13.0, 12.5, 12.7, 16.8, 91.2, 137.3, 142.9, 142.2, 140.6, 139.9, 138.7, 138.3, 138.2, 137.3, 137.3, 136.5, 136.4, 136.1, 136.0, 136.0, 135.2, 135.6, 135.4, 134.7, 134.8, 134.3, 134.2, 134.2, 134.1, 134.1, 133.6, 134.1, 134.1, 134.1, 133.6, 133.4, 133.8, 133.5, 133.5, 133.4, 133.0, 140.2, 157.2, 173.6, 185.0, 187.6, 187.0, 186.3, 186.0, 185.2, 185.1, 185.1, 184.8, 184.7, 187.8, 200.0, 197.7, 200.0, 200.0, 200.0, 200.0, 200.0, 80.6];
+            const speeds = [0.0, 17.7, 94.0, 107.1, 108.7, 109.0, 109.1, 109.2, 108.9, 109.0, 108.9, 108.7, 108.9, 108.9, 109.2, 108.8, 108.7, 108.8, 108.8, 108.6, 108.6, 108.6, 108.7, 108.9, 108.8, 108.7, 108.6, 108.7, 108.7, 109.1, 108.9, 108.8, 108.6, 108.8, 108.7, 109.1, 108.9, 108.9, 108.6, 109.0, 108.8, 108.6, 108.8, 108.8, 108.7, 108.7, 108.5, 108.6, 108.5, 108.6, 119.3, 123.2, 123.9, 124.0, 123.9, 123.8, 123.7, 123.7, 123.8, 123.7, 121.7, 116.3, 96.8, 15.7];
+            
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: distances,
+                    datasets: [{
+                        label: 'Pushing Force [N]',
+                        data: forces,
+                        borderColor: '#FF0000',
+                        backgroundColor: 'rgba(255, 0, 0, 0.1)',
+                        borderWidth: 2,
+                        fill: false,
+                        yAxisID: 'y',
+                        tension: 0.1,
+                        pointRadius: 0
+                    }, {
+                        label: 'Speed [m/min]',
+                        data: speeds,
+                        borderColor: '#0000FF',
+                        backgroundColor: 'rgba(0, 0, 255, 0.1)',
+                        borderWidth: 2,
+                        fill: false,
+                        yAxisID: 'y1',
+                        tension: 0.1,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    aspectRatio: 2,
+                    animation: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Distance [m]',
+                                font: { size: 11, family: 'Helvetica' },
+                                color: '#000000'
+                            },
+                            grid: {
+                                display: true,
+                                color: '#E0E0E0',
+                                borderDash: [5, 5]
+                            },
+                            ticks: {
+                                font: { size: 9, family: 'Helvetica' },
+                                color: '#000000'
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            min: 0,
+                            max: 200,
+                            title: {
+                                display: true,
+                                text: 'Pushing Force [N]',
+                                font: { size: 11, family: 'Helvetica' },
+                                color: '#FF0000'
+                            },
+                            grid: {
+                                display: true,
+                                color: '#E0E0E0',
+                                borderDash: [5, 5]
+                            },
+                            ticks: {
+                                font: { size: 9, family: 'Helvetica' },
+                                color: '#FF0000'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            min: 0,
+                            max: 150,
+                            title: {
+                                display: true,
+                                text: 'Speed [m/min]',
+                                font: { size: 11, family: 'Helvetica' },
+                                color: '#0000FF'
+                            },
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: { size: 9, family: 'Helvetica' },
+                                color: '#0000FF'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+
+    <div class='page-break'></div>
+    <h2>Recorded Data</h2>
+    <table class='data-table'>
+        <thead>
+            <tr class='header-row'>
+                <th>Length<br/>[m]</th>
+                <th>Pushing Force<br/>[N]</th>
+                <th>Duct Pressure<br/>[bar]</th>
+                <th>Speed<br/>[m/min]</th>
+                <th>Time Duration<br/>[hh:mm:ss]</th>
+                <th>Remarks</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>0.0</td>
+                <td>0</td>
+                <td>0.0</td>
+                <td>0.0</td>
+                <td>00:00:00</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>1.0</td>
+                <td>13</td>
+                <td>0.0</td>
+                <td>17.7</td>
+                <td>00:00:03</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>2.0</td>
+                <td>13</td>
+                <td>0.0</td>
+                <td>94.0</td>
+                <td>00:00:03</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>3.0</td>
+                <td>13</td>
+                <td>0.0</td>
+                <td>107.1</td>
+                <td>00:00:04</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>4.0</td>
+                <td>17</td>
+                <td>0.0</td>
+                <td>108.7</td>
+                <td>00:00:04</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>5.0</td>
+                <td>91</td>
+                <td>0.0</td>
+                <td>109.0</td>
+                <td>00:00:05</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>6.0</td>
+                <td>137</td>
+                <td>0.0</td>
+                <td>109.1</td>
+                <td>00:00:05</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>7.0</td>
+                <td>143</td>
+                <td>0.0</td>
+                <td>109.2</td>
+                <td>00:00:06</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>8.0</td>
+                <td>142</td>
+                <td>0.0</td>
+                <td>108.9</td>
+                <td>00:00:06</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>9.0</td>
+                <td>141</td>
+                <td>0.0</td>
+                <td>109.0</td>
+                <td>00:00:07</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>10.0</td>
+                <td>140</td>
+                <td>0.0</td>
+                <td>108.9</td>
+                <td>00:00:08</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>11.0</td>
+                <td>139</td>
+                <td>0.0</td>
+                <td>108.7</td>
+                <td>00:00:08</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>12.0</td>
+                <td>138</td>
+                <td>0.0</td>
+                <td>108.9</td>
+                <td>00:00:09</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>13.0</td>
+                <td>138</td>
+                <td>0.0</td>
+                <td>108.9</td>
+                <td>00:00:09</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>14.0</td>
+                <td>137</td>
+                <td>0.0</td>
+                <td>109.2</td>
+                <td>00:00:10</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>15.0</td>
+                <td>137</td>
+                <td>0.0</td>
+                <td>108.8</td>
+                <td>00:00:10</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>16.0</td>
+                <td>137</td>
+                <td>0.0</td>
+                <td>108.7</td>
+                <td>00:00:11</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>17.0</td>
+                <td>136</td>
+                <td>0.0</td>
+                <td>108.8</td>
+                <td>00:00:11</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>18.0</td>
+                <td>136</td>
+                <td>0.0</td>
+                <td>108.8</td>
+                <td>00:00:12</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>19.0</td>
+                <td>136</td>
+                <td>0.0</td>
+                <td>108.6</td>
+                <td>00:00:13</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>20.0</td>
+                <td>136</td>
+                <td>0.0</td>
+                <td>108.6</td>
+                <td>00:00:13</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>21.0</td>
+                <td>135</td>
+                <td>0.0</td>
+                <td>108.6</td>
+                <td>00:00:14</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>22.0</td>
+                <td>136</td>
+                <td>0.0</td>
+                <td>108.7</td>
+                <td>00:00:14</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>23.0</td>
+                <td>135</td>
+                <td>0.0</td>
+                <td>108.9</td>
+                <td>00:00:15</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>24.0</td>
+                <td>135</td>
+                <td>0.0</td>
+                <td>108.8</td>
+                <td>00:00:15</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>25.0</td>
+                <td>135</td>
+                <td>0.0</td>
+                <td>108.7</td>
+                <td>00:00:16</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>26.0</td>
+                <td>134</td>
+                <td>0.0</td>
+                <td>108.6</td>
+                <td>00:00:16</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>27.0</td>
+                <td>134</td>
+                <td>0.0</td>
+                <td>108.7</td>
+                <td>00:00:17</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>28.0</td>
+                <td>134</td>
+                <td>0.0</td>
+                <td>108.7</td>
+                <td>00:00:17</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>29.0</td>
+                <td>134</td>
+                <td>0.0</td>
+                <td>109.1</td>
+                <td>00:00:18</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>30.0</td>
+                <td>134</td>
+                <td>0.0</td>
+                <td>108.9</td>
+                <td>00:00:19</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>31.0</td>
+                <td>134</td>
+                <td>0.0</td>
+                <td>108.8</td>
+                <td>00:00:19</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>32.0</td>
+                <td>134</td>
+                <td>0.0</td>
+                <td>108.6</td>
+                <td>00:00:20</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>33.0</td>
+                <td>134</td>
+                <td>0.0</td>
+                <td>108.8</td>
+                <td>00:00:20</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>34.0</td>
+                <td>134</td>
+                <td>0.0</td>
+                <td>108.7</td>
+                <td>00:00:21</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>35.0</td>
+                <td>134</td>
+                <td>0.0</td>
+                <td>109.1</td>
+                <td>00:00:21</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>36.0</td>
+                <td>133</td>
+                <td>0.0</td>
+                <td>108.9</td>
+                <td>00:00:22</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>37.0</td>
+                <td>134</td>
+                <td>0.0</td>
+                <td>108.9</td>
+                <td>00:00:22</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>38.0</td>
+                <td>133</td>
+                <td>0.0</td>
+                <td>108.6</td>
+                <td>00:00:23</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>39.0</td>
+                <td>134</td>
+                <td>0.0</td>
+                <td>109.0</td>
+                <td>00:00:24</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>40.0</td>
+                <td>133</td>
+                <td>0.0</td>
+                <td>108.8</td>
+                <td>00:00:24</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>41.0</td>
+                <td>133</td>
+                <td>0.0</td>
+                <td>108.6</td>
+                <td>00:00:25</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>42.0</td>
+                <td>140</td>
+                <td>0.0</td>
+                <td>108.8</td>
+                <td>00:00:25</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>43.0</td>
+                <td>157</td>
+                <td>0.0</td>
+                <td>108.8</td>
+                <td>00:00:26</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>44.0</td>
+                <td>174</td>
+                <td>0.0</td>
+                <td>108.7</td>
+                <td>00:00:26</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>45.0</td>
+                <td>185</td>
+                <td>0.0</td>
+                <td>108.7</td>
+                <td>00:00:27</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>46.0</td>
+                <td>188</td>
+                <td>0.0</td>
+                <td>108.5</td>
+                <td>00:00:27</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>47.0</td>
+                <td>187</td>
+                <td>0.0</td>
+                <td>108.6</td>
+                <td>00:00:28</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>48.0</td>
+                <td>186</td>
+                <td>0.0</td>
+                <td>108.5</td>
+                <td>00:00:28</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>49.0</td>
+                <td>186</td>
+                <td>0.0</td>
+                <td>108.6</td>
+                <td>00:00:29</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>50.0</td>
+                <td>185</td>
+                <td>0.0</td>
+                <td>119.3</td>
+                <td>00:00:30</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>51.0</td>
+                <td>185</td>
+                <td>0.0</td>
+                <td>123.2</td>
+                <td>00:00:30</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>52.0</td>
+                <td>185</td>
+                <td>0.0</td>
+                <td>123.9</td>
+                <td>00:00:31</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>53.0</td>
+                <td>185</td>
+                <td>0.0</td>
+                <td>124.0</td>
+                <td>00:00:31</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>54.0</td>
+                <td>185</td>
+                <td>0.0</td>
+                <td>123.9</td>
+                <td>00:00:32</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>55.0</td>
+                <td>188</td>
+                <td>0.0</td>
+                <td>123.8</td>
+                <td>00:00:32</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>55.9</td>
+                <td>200</td>
+                <td>0.0</td>
+                <td>123.7</td>
+                <td>00:00:32</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>56.0</td>
+                <td>198</td>
+                <td>0.0</td>
+                <td>123.7</td>
+                <td>00:00:33</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>57.0</td>
+                <td>200</td>
+                <td>0.0</td>
+                <td>123.8</td>
+                <td>00:00:33</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>58.0</td>
+                <td>200</td>
+                <td>0.0</td>
+                <td>123.7</td>
+                <td>00:00:34</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>59.0</td>
+                <td>200</td>
+                <td>0.0</td>
+                <td>121.7</td>
+                <td>00:00:34</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>60.0</td>
+                <td>200</td>
+                <td>0.0</td>
+                <td>116.3</td>
+                <td>00:00:35</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>61.0</td>
+                <td>200</td>
+                <td>0.0</td>
+                <td>96.8</td>
+                <td>00:00:35</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>61.5</td>
+                <td>81</td>
+                <td>0.0</td>
+                <td>15.7</td>
+                <td>00:00:41</td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

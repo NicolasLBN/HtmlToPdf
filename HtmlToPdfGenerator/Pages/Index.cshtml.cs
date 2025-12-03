@@ -12,7 +12,7 @@ public class IndexModel : PageModel
     private readonly HtmlToPdfService _htmlToPdfService;
     private readonly EnhancedPdfGeneratorService _enhancedPdfGeneratorService;
 
-    public string JsonFilePath { get; set; } = "../01ebdf62-b7e5-19e8-8000-00142dc07b4a--c10_2025-09-02_13-01_.json";
+    public string JsonFilePath { get; set; } = "../input-report-data.json";
     public string OutputPath { get; set; } = "../output.pdf";
     public string Message { get; set; } = string.Empty;
     public bool IsSuccess { get; set; }
