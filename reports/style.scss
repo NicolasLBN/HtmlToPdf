@@ -1,0 +1,140 @@
+@import "../../shell/variables";
+
+.report-line{
+  width : 100%;
+  border : $light-color solid 1px;
+  margin-bottom : -1px
+}
+
+.report-date--first {
+  width : 100%;
+  margin-bottom: 16px;
+}
+
+.report-date {
+  width : 100%;
+  margin-top: 32px;
+  margin-bottom: 16px;
+}
+
+.report-line--selected{
+  background-color: #d9e2f3
+}
+
+.grid-report-line{
+  display: grid;
+  padding: $padding*2;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 30px 30px 30px;
+}
+
+.item-grid-report-line-tl{
+  grid-column-start:1;
+  grid-column-end:2;
+  grid-row-start:1;
+  grid-row-end: 2
+}
+.item-grid-report-line-ml{
+  grid-column-start:1;
+  grid-column-end:2;
+  grid-row-start:2;
+  grid-row-end: 3
+}
+.item-grid-report-line-ml--long{
+  grid-column-start:1;
+  grid-column-end:3;
+  grid-row-start:2;
+  grid-row-end: 3
+}
+.item-grid-report-line-bl{
+  grid-column-start:1;
+  grid-column-end:2;
+  grid-row-start:3;
+  grid-row-end: 4
+}
+.item-grid-report-line-bl--long{
+  grid-column-start:1;
+  grid-column-end:3;
+  grid-row-start:3;
+  grid-row-end: 4
+}
+.item-grid-report-line-tm{
+  grid-column-start:2;
+  grid-column-end:3;
+  grid-row-start:1;
+  grid-row-end: 2
+}
+.item-grid-report-line-mm{
+  grid-column-start:2;
+  grid-column-end:3;
+  grid-row-start:2;
+  grid-row-end: 3
+}
+.item-grid-report-line-bm{
+  grid-column-start:2;
+  grid-column-end:3;
+  grid-row-start:3;
+  grid-row-end: 4
+}
+.item-grid-report-line-tr{
+  grid-column-start:3;
+  grid-column-end:4;
+  grid-row-start:1;
+  grid-row-end: 2
+}
+.item-grid-report-line-mr{
+  grid-column-start:3;
+  grid-column-end:4;
+  grid-row-start:2;
+  grid-row-end: 3
+}
+.item-grid-report-line-br{
+  grid-column-start:3;
+  grid-column-end:4;
+  grid-row-start:3;
+  grid-row-end: 4
+}
+.item-grid-report-line-fullright{
+  grid-column-start:3;
+  grid-column-end:4;
+  grid-row-start:1;
+  grid-row-end: 4
+}
+.btn--pdf{
+  background: #FFFFFF;
+  box-shadow: 0 0 2px 0 rgba(0,0,0,0.12), 0 2px 2px 0 rgba(0,0,0,0.24);
+  border-radius: 2px;
+}
+.btn--progress {
+  background: #FFFFFF;
+  box-shadow: 0 0 2px 0 rgba(0,0,0,0.12), 0 2px 2px 0 rgba(0,0,0,0.24);
+  border-radius: 2px;
+  padding-top: 0px;
+  padding-right: 4px;
+  font-size: 12px;
+  text-transform: lowercase;
+  text-align: right;
+}
+.btn--progress svg{
+  max-height: 80%
+}
+.btn--pdf svg{
+  max-height: 100%
+}
+.btn--delete{
+  position: sticky;
+  bottom: 0;
+  padding: 10px 0px
+}
+.warning{
+  border-color: red;
+  background-color: #ff00001c;
+}
+#waitIcon{
+  -webkit-animation:spin 4s linear infinite;
+   -moz-animation:spin 4s linear infinite;
+   animation:spin 4s linear infinite;
+}
+@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
