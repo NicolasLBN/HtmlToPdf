@@ -10,6 +10,7 @@ QuestPDF.Settings.License = LicenseType.Community;
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<JsonReaderService>();
 builder.Services.AddScoped<PdfGeneratorService>();
+builder.Services.AddScoped<NodeJsPdfGeneratorService>();
 
 var app = builder.Build();
 
@@ -22,13 +23,12 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 
 app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapStaticAssets();
-app.MapRazorPages()
-   .WithStaticAssets();
+app.MapRazorPages();
 
 app.Run();
