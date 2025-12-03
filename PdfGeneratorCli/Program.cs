@@ -1,149 +1,147 @@
 using System.Diagnostics;
+using HtmlToPdfGenerator.Models;
+using HtmlToPdfGenerator.Services;
+using PuppeteerSharp;
+using PuppeteerSharp.Media;
 
-// Configuration: Path to Node.js script relative to CLI directory
-const string NodeScriptRelativePath = "../reports/generate-pdf-standalone.js";
+return await Run(args);
 
-Console.WriteLine("HTML to PDF Generator (using Node.js)");
-Console.WriteLine("======================================\n");
-
-string jsonFilePath = "../01ebdf62-b7e5-19e8-8000-00142dc07b4a--c10_2025-09-02_13-01_.json";
-string outputPath = "../generated_report.pdf";
-
-// Allow command line arguments to override defaults
-if (args.Length >= 1)
+static async Task<int> Run(string[] args)
 {
-    jsonFilePath = args[0];
-}
-if (args.Length >= 2)
-{
-    outputPath = args[1];
-}
+    Console.WriteLine("HTML to PDF Generator");
+    Console.WriteLine("=====================\n");
 
-// Resolve to absolute paths
-jsonFilePath = Path.GetFullPath(jsonFilePath);
-outputPath = Path.GetFullPath(outputPath);
+    string jsonFilePath = "../input-report-data.json";
+    string outputPath = "../output-enhanced.pdf";
 
-Console.WriteLine($"Input JSON: {jsonFilePath}");
-Console.WriteLine($"Output PDF: {outputPath}\n");
-
-// Find Node.js executable
-string nodeExecutable = FindNodeExecutable();
-if (string.IsNullOrEmpty(nodeExecutable))
-{
-    Console.WriteLine("Error: Node.js not found. Please install Node.js.");
-    Environment.Exit(1);
-}
-
-// Get the Node.js script path
-var scriptPath = Path.Combine(Directory.GetCurrentDirectory(), NodeScriptRelativePath);
-scriptPath = Path.GetFullPath(scriptPath);
-
-if (!File.Exists(scriptPath))
-{
-    Console.WriteLine($"Error: Node.js script not found at: {scriptPath}");
-    Environment.Exit(1);
-}
-
-if (!File.Exists(jsonFilePath))
-{
-    Console.WriteLine($"Error: Input JSON file not found: {jsonFilePath}");
-    Environment.Exit(1);
-}
-
-try
-{
-    Console.WriteLine("Generating PDF using Node.js...");
-    
-    var startInfo = new ProcessStartInfo
+    // Allow command line arguments to override defaults
+    if (args.Length >= 1)
     {
-        FileName = nodeExecutable,
-        Arguments = $"\"{scriptPath}\" \"{jsonFilePath}\" \"{outputPath}\"",
-        RedirectStandardOutput = true,
-        RedirectStandardError = true,
-        UseShellExecute = false,
-        CreateNoWindow = true,
-        WorkingDirectory = Path.GetDirectoryName(scriptPath)
-    };
-
-    using var process = new Process { StartInfo = startInfo };
-    
-    process.OutputDataReceived += (sender, e) =>
+        jsonFilePath = args[0];
+    }
+    if (args.Length >= 2)
     {
-        if (!string.IsNullOrEmpty(e.Data))
+        outputPath = args[1];
+    }
+
+    // Resolve to absolute paths
+    jsonFilePath = Path.GetFullPath(jsonFilePath);
+    outputPath = Path.GetFullPath(outputPath);
+
+    Console.WriteLine($"Input JSON: {jsonFilePath}");
+    Console.WriteLine($"Output PDF: {outputPath}\n");
+
+    if (!File.Exists(jsonFilePath))
+    {
+        Console.WriteLine($"Error: Input JSON file not found: {jsonFilePath}");
+        return 1;
+    }
+
+    try
+    {
+        // Generate enhanced HTML with charts
+        Console.WriteLine("Generating HTML report with charts...");
+        var jsonReaderService = new JsonReaderService();
+        var htmlReportGeneratorService = new HtmlReportGeneratorService();
+        
+        var reportData = jsonReaderService.ReadJsonFile(jsonFilePath);
+        if (reportData == null)
         {
-            Console.WriteLine($"[Node.js] {e.Data}");
+            Console.WriteLine("Error: Failed to read JSON data");
+            return 1;
         }
-    };
-
-    process.ErrorDataReceived += (sender, e) =>
-    {
-        if (!string.IsNullOrEmpty(e.Data))
-        {
-            Console.WriteLine($"[Error] {e.Data}");
-        }
-    };
-
-    process.Start();
-    process.BeginOutputReadLine();
-    process.BeginErrorReadLine();
-    process.WaitForExit();
-
-    if (process.ExitCode == 0)
-    {
+        
+        var htmlContent = htmlReportGeneratorService.GenerateHtmlReport(reportData);
+        var htmlPath = Path.ChangeExtension(outputPath, ".html");
+        File.WriteAllText(htmlPath, htmlContent);
+        Console.WriteLine($"HTML report saved to: {htmlPath}");
+        
+        // Convert HTML to PDF using PuppeteerSharp
+        Console.WriteLine("\nConverting HTML to PDF using Puppeteer...");
+        var htmlToPdfService = new HtmlToPdfServiceWrapper();
+        
+        await htmlToPdfService.ConvertHtmlToPdfAsync(htmlContent, outputPath);
         Console.WriteLine($"\nSuccess! PDF generated at: {outputPath}");
+        
+        return 0;
     }
-    else
+    catch (Exception ex)
     {
-        Console.WriteLine($"\nError: PDF generation failed with exit code {process.ExitCode}");
-        Environment.Exit(1);
+        Console.WriteLine($"\nError: {ex.Message}");
+        Console.WriteLine(ex.StackTrace);
+        return 1;
     }
 }
-catch (Exception ex)
-{
-    Console.WriteLine($"\nError: {ex.Message}");
-    Environment.Exit(1);
-}
 
-static string FindNodeExecutable()
+// Simple wrapper for HtmlToPdfService that handles the PDF conversion
+class HtmlToPdfServiceWrapper
 {
-    var possiblePaths = new[]
+    public async Task ConvertHtmlToPdfAsync(string htmlContent, string outputPath)
     {
-        "node",
-        "/usr/local/bin/node",
-        "/usr/bin/node",
-        "C:\\Program Files\\nodejs\\node.exe",
-        "C:\\Program Files (x86)\\nodejs\\node.exe"
-    };
-
-    foreach (var path in possiblePaths)
-    {
-        try
+        // Use system-installed Chrome/Chromium instead of downloading
+        var chromePath = FindChromePath();
+        if (string.IsNullOrEmpty(chromePath))
         {
-            var startInfo = new ProcessStartInfo
-            {
-                FileName = path,
-                Arguments = "--version",
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
+            throw new Exception("Chrome/Chromium not found. Please install Chrome or Chromium.");
+        }
+        
+        Console.WriteLine($"Using Chrome at: {chromePath}");
 
-            using var process = Process.Start(startInfo);
-            if (process != null)
+        // Launch browser
+        var launchOptions = new LaunchOptions
+        {
+            Headless = true,
+            ExecutablePath = chromePath,
+            Args = new[] { "--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage" }
+        };
+
+        await using var browser = await Puppeteer.LaunchAsync(launchOptions);
+        await using var page = await browser.NewPageAsync();
+
+        // Set content and wait for it to load
+        await page.SetContentAsync(htmlContent);
+        await page.WaitForNetworkIdleAsync();
+
+        // Generate PDF
+        var pdfOptions = new PdfOptions
+        {
+            Format = PaperFormat.A4,
+            PrintBackground = true,
+            MarginOptions = new MarginOptions
             {
-                // Increased timeout for slower systems
-                process.WaitForExit(5000);
-                if (process.ExitCode == 0)
-                {
-                    return path;
-                }
+                Top = "10mm",
+                Bottom = "10mm",
+                Left = "10mm",
+                Right = "10mm"
+            }
+        };
+
+        await page.PdfAsync(outputPath, pdfOptions);
+    }
+    
+    private static string FindChromePath()
+    {
+        var possiblePaths = new[]
+        {
+            "/usr/bin/google-chrome",
+            "/usr/bin/chromium-browser",
+            "/usr/bin/chromium",
+            "/snap/bin/chromium",
+            "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+            "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+            "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+        };
+
+        foreach (var path in possiblePaths)
+        {
+            if (File.Exists(path))
+            {
+                return path;
             }
         }
-        catch
-        {
-            // Continue trying other paths
-        }
-    }
 
-    return string.Empty;
+        return string.Empty;
+    }
 }
+
+
