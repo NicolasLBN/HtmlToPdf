@@ -134,9 +134,18 @@ public class HtmlReportGeneratorService
             html.AppendLine("        </thead>");
             html.AppendLine("        <tbody>");
             
-            var startTimestamp = reportData.Data.Rows.Count > 0 && reportData.Data.Rows[0].Count > 6 
-                ? Convert.ToDouble(reportData.Data.Rows[0][6]) 
-                : 0;
+            double startTimestamp = 0;
+            if (reportData.Data.Rows.Count > 0 && reportData.Data.Rows[0].Count > 6)
+            {
+                try
+                {
+                    startTimestamp = Convert.ToDouble(reportData.Data.Rows[0][6]);
+                }
+                catch
+                {
+                    startTimestamp = 0;
+                }
+            }
             
             var maxRows = Math.Min(100, reportData.Data.Rows.Count);
             for (int i = 0; i < maxRows; i++)
@@ -144,21 +153,29 @@ public class HtmlReportGeneratorService
                 var row = reportData.Data.Rows[i];
                 if (row.Count >= 8)
                 {
-                    var distance = Convert.ToDouble(row[1]);
-                    var speed = Convert.ToDouble(row[2]);
-                    var force = Convert.ToDouble(row[3]);
-                    var blowing = Convert.ToDouble(row[4]);
-                    var stamp = Convert.ToDouble(row[6]);
-                    var comment = row[7]?.ToString() ?? "";
+                    try
+                    {
+                        var distance = Convert.ToDouble(row[1]);
+                        var speed = Convert.ToDouble(row[2]);
+                        var force = Convert.ToDouble(row[3]);
+                        var blowing = Convert.ToDouble(row[4]);
+                        var stamp = Convert.ToDouble(row[6]);
+                        var comment = row[7]?.ToString() ?? "";
                     
-                    html.AppendLine("            <tr>");
-                    html.AppendLine($"                <td>{distance:F1}</td>");
-                    html.AppendLine($"                <td>{force:F0}</td>");
-                    html.AppendLine($"                <td>{blowing:F1}</td>");
-                    html.AppendLine($"                <td>{speed:F1}</td>");
-                    html.AppendLine($"                <td>{FormatDuration((int)(stamp - startTimestamp))}</td>");
-                    html.AppendLine($"                <td>{EscapeHtml(comment)}</td>");
-                    html.AppendLine("            </tr>");
+                        html.AppendLine("            <tr>");
+                        html.AppendLine($"                <td>{distance:F1}</td>");
+                        html.AppendLine($"                <td>{force:F0}</td>");
+                        html.AppendLine($"                <td>{blowing:F1}</td>");
+                        html.AppendLine($"                <td>{speed:F1}</td>");
+                        html.AppendLine($"                <td>{FormatDuration((int)(stamp - startTimestamp))}</td>");
+                        html.AppendLine($"                <td>{EscapeHtml(comment)}</td>");
+                        html.AppendLine("            </tr>");
+                    }
+                    catch
+                    {
+                        // Skip rows with invalid data
+                        continue;
+                    }
                 }
             }
             

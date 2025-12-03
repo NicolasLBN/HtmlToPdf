@@ -259,9 +259,18 @@ public class EnhancedPdfGeneratorService
                                     });
 
                                     // Data rows
-                                    var startTimestamp = reportData.Data.Rows.Count > 0 && reportData.Data.Rows[0].Count > 6 
-                                        ? Convert.ToDouble(reportData.Data.Rows[0][6]) 
-                                        : 0;
+                                    double startTimestamp = 0;
+                                    if (reportData.Data.Rows.Count > 0 && reportData.Data.Rows[0].Count > 6)
+                                    {
+                                        try
+                                        {
+                                            startTimestamp = Convert.ToDouble(reportData.Data.Rows[0][6]);
+                                        }
+                                        catch
+                                        {
+                                            startTimestamp = 0;
+                                        }
+                                    }
                                     
                                     var maxRows = Math.Min(100, reportData.Data.Rows.Count);
                                     for (int i = 0; i < maxRows; i++)
@@ -269,32 +278,40 @@ public class EnhancedPdfGeneratorService
                                         var row = reportData.Data.Rows[i];
                                         if (row.Count >= 8)
                                         {
-                                            var distance = Convert.ToDouble(row[1]);
-                                            var speed = Convert.ToDouble(row[2]);
-                                            var force = Convert.ToDouble(row[3]);
-                                            var blowing = Convert.ToDouble(row[4]);
-                                            var stamp = Convert.ToDouble(row[6]);
-                                            var comment = row[7]?.ToString() ?? "";
+                                            try
+                                            {
+                                                var distance = Convert.ToDouble(row[1]);
+                                                var speed = Convert.ToDouble(row[2]);
+                                                var force = Convert.ToDouble(row[3]);
+                                                var blowing = Convert.ToDouble(row[4]);
+                                                var stamp = Convert.ToDouble(row[6]);
+                                                var comment = row[7]?.ToString() ?? "";
 
-                                            var bgColor = i % 2 == 1 ? "#f9f9f9" : "#ffffff";
+                                                var bgColor = i % 2 == 1 ? "#f9f9f9" : "#ffffff";
 
-                                            table.Cell().Background(bgColor).Border(0.5f).BorderColor("#cccccc")
-                                                .Padding(1, Unit.Millimetre).AlignCenter().Text($"{distance:F1}").FontSize(7);
-                                            
-                                            table.Cell().Background(bgColor).Border(0.5f).BorderColor("#cccccc")
-                                                .Padding(1, Unit.Millimetre).AlignCenter().Text($"{force:F0}").FontSize(7);
-                                            
-                                            table.Cell().Background(bgColor).Border(0.5f).BorderColor("#cccccc")
-                                                .Padding(1, Unit.Millimetre).AlignCenter().Text($"{blowing:F1}").FontSize(7);
-                                            
-                                            table.Cell().Background(bgColor).Border(0.5f).BorderColor("#cccccc")
-                                                .Padding(1, Unit.Millimetre).AlignCenter().Text($"{speed:F1}").FontSize(7);
-                                            
-                                            table.Cell().Background(bgColor).Border(0.5f).BorderColor("#cccccc")
-                                                .Padding(1, Unit.Millimetre).AlignCenter().Text(FormatDuration((int)(stamp - startTimestamp))).FontSize(7);
-                                            
-                                            table.Cell().Background(bgColor).Border(0.5f).BorderColor("#cccccc")
-                                                .Padding(1, Unit.Millimetre).AlignCenter().Text(comment).FontSize(7);
+                                                table.Cell().Background(bgColor).Border(0.5f).BorderColor("#cccccc")
+                                                    .Padding(1, Unit.Millimetre).AlignCenter().Text($"{distance:F1}").FontSize(7);
+                                                
+                                                table.Cell().Background(bgColor).Border(0.5f).BorderColor("#cccccc")
+                                                    .Padding(1, Unit.Millimetre).AlignCenter().Text($"{force:F0}").FontSize(7);
+                                                
+                                                table.Cell().Background(bgColor).Border(0.5f).BorderColor("#cccccc")
+                                                    .Padding(1, Unit.Millimetre).AlignCenter().Text($"{blowing:F1}").FontSize(7);
+                                                
+                                                table.Cell().Background(bgColor).Border(0.5f).BorderColor("#cccccc")
+                                                    .Padding(1, Unit.Millimetre).AlignCenter().Text($"{speed:F1}").FontSize(7);
+                                                
+                                                table.Cell().Background(bgColor).Border(0.5f).BorderColor("#cccccc")
+                                                    .Padding(1, Unit.Millimetre).AlignCenter().Text(FormatDuration((int)(stamp - startTimestamp))).FontSize(7);
+                                                
+                                                table.Cell().Background(bgColor).Border(0.5f).BorderColor("#cccccc")
+                                                    .Padding(1, Unit.Millimetre).AlignCenter().Text(comment).FontSize(7);
+                                            }
+                                            catch
+                                            {
+                                                // Skip rows with invalid data
+                                                continue;
+                                            }
                                         }
                                     }
                                 });
