@@ -8,6 +8,9 @@ namespace HtmlToPdfGenerator.Services;
 /// </summary>
 public class NodeJsPdfGeneratorService
 {
+    // Configuration: Path to Node.js script relative to project root
+    private const string NodeScriptRelativePath = "../reports/generate-pdf-standalone.js";
+    
     private readonly ILogger<NodeJsPdfGeneratorService> _logger;
     private readonly string _nodeScriptPath;
     private readonly string _nodeExecutable;
@@ -18,7 +21,7 @@ public class NodeJsPdfGeneratorService
         
         // Get the path to the Node.js script relative to the project
         var projectRoot = Directory.GetCurrentDirectory();
-        _nodeScriptPath = Path.Combine(projectRoot, "..", "reports", "generate-pdf-standalone.js");
+        _nodeScriptPath = Path.Combine(projectRoot, NodeScriptRelativePath);
         
         // Try to find node executable
         _nodeExecutable = FindNodeExecutable();
@@ -140,7 +143,8 @@ public class NodeJsPdfGeneratorService
                 using var process = Process.Start(startInfo);
                 if (process != null)
                 {
-                    process.WaitForExit(1000);
+                    // Increased timeout for slower systems
+                    process.WaitForExit(5000);
                     if (process.ExitCode == 0)
                     {
                         _logger.LogInformation("Found Node.js at: {Path}", path);

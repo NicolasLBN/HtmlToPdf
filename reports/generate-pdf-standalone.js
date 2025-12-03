@@ -164,8 +164,10 @@ async function generatePdf(jsonPath, pdfPath) {
       doc.setFont('helvetica', 'bold');
       doc.text('Recorded Data', 15, 20);
       
-      // Prepare table data
-      const dataRows = jsonData.data.slice(0, 50).map(row => [
+      // Prepare table data - limiting to reasonable page size for display
+      // For production, consider pagination or separate full data export
+      const maxRows = 100; // Show first 100 rows
+      const dataRows = jsonData.data.slice(0, maxRows).map(row => [
         row.distance?.toFixed(1) || '',
         row.force?.toString() || '',
         row.blowing?.toFixed(1) || '',
@@ -182,6 +184,13 @@ async function generatePdf(jsonPath, pdfPath) {
         styles: { fontSize: 7 },
         headStyles: { fillColor: [200, 200, 200], textColor: 0, fontStyle: 'bold' }
       });
+      
+      // Add note if data was truncated
+      if (jsonData.data.length > maxRows) {
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'italic');
+        doc.text(`Showing first ${maxRows} of ${jsonData.data.length} data points`, 15, doc.lastAutoTable.finalY + 10);
+      }
     }
 
     // Save PDF

@@ -1,5 +1,8 @@
 using System.Diagnostics;
 
+// Configuration: Path to Node.js script relative to CLI directory
+const string NodeScriptRelativePath = "../reports/generate-pdf-standalone.js";
+
 Console.WriteLine("HTML to PDF Generator (using Node.js)");
 Console.WriteLine("======================================\n");
 
@@ -32,7 +35,7 @@ if (string.IsNullOrEmpty(nodeExecutable))
 }
 
 // Get the Node.js script path
-var scriptPath = Path.Combine(Directory.GetCurrentDirectory(), "..", "reports", "generate-pdf-standalone.js");
+var scriptPath = Path.Combine(Directory.GetCurrentDirectory(), NodeScriptRelativePath);
 scriptPath = Path.GetFullPath(scriptPath);
 
 if (!File.Exists(scriptPath))
@@ -128,7 +131,8 @@ static string FindNodeExecutable()
             using var process = Process.Start(startInfo);
             if (process != null)
             {
-                process.WaitForExit(1000);
+                // Increased timeout for slower systems
+                process.WaitForExit(5000);
                 if (process.ExitCode == 0)
                 {
                     return path;
