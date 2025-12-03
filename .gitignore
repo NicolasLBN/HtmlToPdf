@@ -41,3 +41,7 @@ Thumbs.db
 
 # Frontend libraries (restored via libman)
 **/wwwroot/lib/
+
+# Node.js
+node_modules/
+package-lock.json
